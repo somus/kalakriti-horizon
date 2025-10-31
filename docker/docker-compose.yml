@@ -1,0 +1,80 @@
+services:
+  postgres:
+    image: postgres:16.2-alpine
+    shm_size: 1g
+    user: postgres
+    restart: always
+    healthcheck:
+      test: 'pg_isready -U ${PG_USER} --dbname=${PG_DB}'
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 5411:5432
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_DB: ${PG_DB}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+    command: |
+      postgres
+      -c wal_level=logical
+      -c max_wal_senders=10
+      -c max_replication_slots=5
+      -c hot_standby=on
+      -c hot_standby_feedback=on
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./:/docker-entrypoint-initdb.d
+  zero_cache:
+    image: 'rocicorp/zero:latest'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - 'ZERO_UPSTREAM_DB=postgresql://${PG_USER}:${PG_PASSWORD}@postgres:5432/${PG_DB}'
+      - 'ZERO_CVR_DB=postgresql://${PG_USER}:${PG_PASSWORD}@postgres:5432/${PG_DB}'
+      - 'ZERO_CHANGE_DB=postgresql://${PG_USER}:${PG_PASSWORD}@postgres:5432/${PG_DB}'
+      - 'ZERO_AUTH_JWKS_URL=${ZERO_AUTH_JWKS_URL}'
+      - 'ZERO_ADMIN_PASSWORD=${ZERO_ADMIN_PASSWORD}'
+      - ZERO_GET_QUERIES_URL=http://api:3000/api/get-queries
+      - ZERO_MUTATE_URL=http://api:3000
+      - ZERO_REPLICA_FILE=/zero_data/zchat_replica.db
+      - ZERO_PORT=4848
+      - 'OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}'
+      - 'OTEL_EXPORTER_OTLP_HEADERS=${OTEL_EXPORTER_OTLP_HEADERS}'
+      - 'OTEL_RESOURCE_ATTRIBUTES=${OTEL_RESOURCE_ATTRIBUTES}'
+      - 'OTEL_NODE_RESOURCE_DETECTORS=${OTEL_NODE_RESOURCE_DETECTORS}'
+
+    volumes:
+      - 'replica:/zero_data'
+  api:
+    build:
+      dockerfile_inline: |
+        FROM oven/bun:alpine
+        USER bun
+        WORKDIR /app
+        COPY . .
+        RUN bun install --lockfile-only
+        ARG PORT
+        EXPOSE ${PORT:-3000}
+        CMD ["bun", "run", "prod:api"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      zero_cache:
+        condition: service_started
+    environment:
+      - 'ZERO_UPSTREAM_DB=postgresql://${PG_USER}:${PG_PASSWORD}@postgres:5432/${PG_DB}'
+      - 'CLERK_SECRET_KEY=${CLERK_SECRET_KEY}'
+      - 'CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY}'
+      - 'SENTRY_DSN=${SENTRY_DSN}'
+      - 'R2_ACCOUNT_ID=${R2_ACCOUNT_ID}'
+      - 'R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}'
+      - 'R2_SECRET_KEY_ID=${R2_SECRET_KEY_ID}'
+      - 'R2_BUCKET_NAME=${R2_BUCKET_NAME}'
+      - 'ASSET_FOLDER=${ASSET_FOLDER}'
+
+volumes:
+  pgdata:
+    driver: local
+  replica:
