@@ -5,8 +5,10 @@ import {
 	CardTitle
 } from '@/components/ui/card';
 import { H3 } from '@/components/ui/typography';
-import { Class, ClassOutletContext } from '@/layout/ClassLayout';
+import { ClassOutletContext } from '@/layout/ClassLayout';
 import { Link, useOutletContext } from 'react-router';
+
+import { ClassType } from '../ClassesView/ClassesView';
 
 export default function ClassView() {
 	const { class: currentClass } = useOutletContext<ClassOutletContext>();
@@ -14,7 +16,7 @@ export default function ClassView() {
 	return <ClassPage currentClass={currentClass} />;
 }
 
-export function ClassPage({ currentClass }: { currentClass: Class }) {
+export function ClassPage({ currentClass }: { currentClass: ClassType }) {
 	return (
 		<div className='@container/main flex flex-col gap-4 py-4 md:gap-6 md:py-6'>
 			<div className='px-4 flex flex-col gap-2'>
@@ -28,9 +30,15 @@ export function ClassPage({ currentClass }: { currentClass: Class }) {
 						{currentClass.guardian?.firstName} {currentClass.guardian?.lastName}
 					</p>
 					<p>
-						<strong>Coordinator:</strong>
-						{currentClass.coordinator?.firstName}{' '}
-						{currentClass.coordinator?.lastName}
+						<strong>
+							Coordinator{currentClass.coordinators.length > 1 ? 's' : ''}:
+						</strong>
+						{currentClass.coordinators
+							.map(
+								coordinator =>
+									`${coordinator.coordinator?.firstName} ${coordinator.coordinator?.lastName}`
+							)
+							.join(', ')}
 					</p>
 					<p>
 						<strong>Trainer:</strong>

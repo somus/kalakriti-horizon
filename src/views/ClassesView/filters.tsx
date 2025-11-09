@@ -26,15 +26,21 @@ export const columnsConfig = [
 		.icon(Heading2Icon)
 		.build(),
 	dtf
-		.option()
-		.accessor(row => row.coordinator)
-		.id('coordinator')
+		.multiOption()
+		.accessor(row =>
+			row.coordinators.map(coordinator => coordinator.coordinator)
+		)
+		.id('coordinators')
 		.displayName('Coordinator')
 		.icon(ShieldUserIcon)
-		.transformOptionFn(c => ({
-			value: c.id,
-			label: `${c.firstName} ${c.lastName}`
-		}))
+		.transformOptionFn(data => {
+			const coordinator =
+				data as unknown as ClassType['coordinators'][number]['coordinator'];
+			return {
+				value: coordinator?.id ?? '',
+				label: coordinator?.firstName + ' ' + coordinator?.lastName
+			};
+		})
 		.build(),
 	dtf
 		.option()

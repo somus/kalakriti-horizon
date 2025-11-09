@@ -32,7 +32,7 @@ export const users = pgTable('users', {
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-	coordinatingClasses: many(classes),
+	coordinatingClasses: many(classCoordinators),
 	trainingClasses: many(classes),
 	guardianingClasses: many(classes)
 }));
@@ -44,9 +44,6 @@ export const classes = pgTable('classes', {
 	guardianId: varchar('guardian_id').references(() => users.id, {
 		onDelete: 'set null'
 	}),
-	coordinatorId: varchar('coordinator_id').references(() => users.id, {
-		onDelete: 'set null'
-	}),
 	trainerId: varchar('trainer_id').references(() => users.id, {
 		onDelete: 'set null'
 	}),
@@ -56,10 +53,7 @@ export const classes = pgTable('classes', {
 });
 
 export const classesRelations = relations(classes, ({ one, many }) => ({
-	coordinator: one(users, {
-		fields: [classes.coordinatorId],
-		references: [users.id]
-	}),
+	coordinators: many(classCoordinators),
 	trainer: one(users, {
 		fields: [classes.trainerId],
 		references: [users.id]
@@ -72,6 +66,35 @@ export const classesRelations = relations(classes, ({ one, many }) => ({
 	sessions: many(sessions),
 	invoices: many(invoices)
 }));
+
+export const classCoordinators = pgTable(
+	'class_coordinators',
+	{
+		coordinatorId: varchar('user_id')
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
+		classId: varchar('class_id')
+			.notNull()
+			.references(() => classes.id, { onDelete: 'cascade' }),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at').defaultNow().notNull()
+	},
+	t => [primaryKey({ columns: [t.coordinatorId, t.classId] })]
+);
+
+export const classCoordinatorsRelations = relations(
+	classCoordinators,
+	({ one }) => ({
+		class: one(classes, {
+			fields: [classCoordinators.classId],
+			references: [classes.id]
+		}),
+		coordinator: one(users, {
+			fields: [classCoordinators.coordinatorId],
+			references: [users.id]
+		})
+	})
+);
 
 export const participants = pgTable('participants', {
 	id: varchar('id').primaryKey(),

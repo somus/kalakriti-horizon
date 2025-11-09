@@ -47,7 +47,9 @@ export const queries = {
 	classes: syncedQueryWithContext('classes', z.tuple([]), (ctx: AuthData) => {
 		let query = builder.classes;
 		if (ctx.meta.role === Roles.COORDINATOR) {
-			query = query.where('coordinatorId', ctx.sub);
+			query = query.whereExists('coordinators', q =>
+				q.where('coordinatorId', ctx.sub)
+			);
 		}
 		if (ctx.meta.role === Roles.GUARDIAN) {
 			query = query.where('guardianId', ctx.sub);
@@ -63,14 +65,16 @@ export const queries = {
 		z.tuple([]),
 		(ctx: AuthData) => {
 			const query = builder.classes
-				.related('coordinator')
+				.related('coordinators', q => q.related('coordinator'))
 				.related('guardian')
 				.related('invoices')
 				.related('participants')
 				.related('sessions')
 				.related('trainer');
 			if (ctx.meta.role === Roles.COORDINATOR) {
-				query.where('coordinatorId', ctx.sub);
+				query.whereExists('coordinators', q =>
+					q.where('coordinatorId', ctx.sub)
+				);
 			}
 			if (ctx.meta.role === Roles.GUARDIAN) {
 				query.where('guardianId', ctx.sub);
@@ -87,7 +91,7 @@ export const queries = {
 		z.tuple([z.cuid2()]),
 		(ctx: AuthData, id) => {
 			let query = builder.classes
-				.related('coordinator')
+				.related('coordinators', q => q.related('coordinator'))
 				.related('guardian')
 				.related('invoices')
 				.related('participants', q => q.related('participatedSessions'))
@@ -98,7 +102,9 @@ export const queries = {
 				.where('id', id);
 
 			if (ctx.meta.role === Roles.COORDINATOR) {
-				query = query.where('coordinatorId', ctx.sub);
+				query = query.whereExists('coordinators', q =>
+					q.where('coordinatorId', ctx.sub)
+				);
 			}
 
 			if (ctx.meta.role === Roles.TRAINER) {

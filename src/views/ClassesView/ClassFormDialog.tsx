@@ -1,4 +1,5 @@
 import { FormLayout, InputField, SelectField } from '@/components/form';
+import { MultiSelectField } from '@/components/form/MultiSelectField';
 import { Button } from '@/components/ui/button';
 import {
 	Modal,
@@ -16,13 +17,16 @@ import { LoaderCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { queries } from 'shared/db/queries';
-import { Class } from 'shared/db/zero-schema.gen';
 import * as z from 'zod';
+
+import { ClassType } from './ClassesView';
 
 const classSchema = z.object({
 	name: z.string({ error: 'Name is required' }),
 	description: z.string().optional(),
-	coordinatorId: z.string(),
+	coordinatorIds: z
+		.array(z.string(), { error: 'Coordinators are required' })
+		.min(1, { error: 'Coordinators are required' }),
 	trainerId: z.string(),
 	guardianId: z.string(),
 	trainerCostPerSession: z.number().min(1)
@@ -36,7 +40,7 @@ export default function ClassFormModal({
 	onOpenChange,
 	children
 }: {
-	currentClass?: Class;
+	currentClass?: ClassType;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	children?: React.ReactNode;
@@ -80,7 +84,9 @@ export default function ClassFormModal({
 		return {
 			name: currentClass.name,
 			description: currentClass.description ?? undefined,
-			coordinatorId: currentClass.coordinatorId ?? undefined,
+			coordinatorIds: currentClass.coordinators.map(
+				coordinator => coordinator.coordinatorId
+			),
 			trainerId: currentClass.trainerId ?? undefined,
 			guardianId: currentClass.guardianId ?? undefined,
 			trainerCostPerSession: currentClass.trainerCostPerSession
@@ -152,11 +158,11 @@ export default function ClassFormModal({
 							options={guardianOptions}
 							isRequired
 						/>
-						<SelectField
-							name='coordinatorId'
-							label='Coordinator'
+						<MultiSelectField
+							name='coordinatorIds'
+							label='Coordinators'
 							options={coordinatorOptions}
-							isRequired
+							placeholder='Select coordinators'
 						/>
 						<SelectField
 							name='trainerId'

@@ -33,18 +33,24 @@ export const columns = [
 		),
 		cell: ({ row }) => <div>{row.getValue('description')}</div>
 	}),
-	columnHelper.accessor(row => row.coordinator, {
-		id: 'coordinator',
+	columnHelper.accessor(row => row.coordinators, {
+		id: 'coordinators',
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title='Coordinator' />
 		),
 		cell: ({ row }) => {
-			const coordinator = row.getValue<ClassType['coordinator']>('coordinator');
+			const coordinators =
+				row.getValue<ClassType['coordinators']>('coordinators');
 
 			return (
-				<Badge variant='outline' key={coordinator?.id}>
-					{coordinator?.firstName} {coordinator?.lastName ?? ''}
-				</Badge>
+				<div>
+					{coordinators.map(coordinator => (
+						<Badge variant='outline' key={coordinator.coordinatorId}>
+							{coordinator.coordinator?.firstName}{' '}
+							{coordinator.coordinator?.lastName ?? ''}
+						</Badge>
+					))}
+				</div>
 			);
 		}
 	}),

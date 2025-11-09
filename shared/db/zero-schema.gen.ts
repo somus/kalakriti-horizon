@@ -19,6 +19,53 @@ import type { default as zeroSchema } from "./drizzle-zero.config";
  */
 export const schema = {
   tables: {
+    classCoordinators: {
+      name: "classCoordinators",
+      columns: {
+        coordinatorId: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "classCoordinators",
+            "coordinatorId"
+          >,
+          serverName: "user_id",
+        },
+        classId: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "classCoordinators",
+            "classId"
+          >,
+          serverName: "class_id",
+        },
+        createdAt: {
+          type: "number",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "classCoordinators",
+            "createdAt"
+          >,
+          serverName: "created_at",
+        },
+        updatedAt: {
+          type: "number",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "classCoordinators",
+            "updatedAt"
+          >,
+          serverName: "updated_at",
+        },
+      },
+      primaryKey: ["coordinatorId", "classId"],
+      serverName: "class_coordinators",
+    },
     classes: {
       name: "classes",
       columns: {
@@ -58,16 +105,6 @@ export const schema = {
             "guardianId"
           >,
           serverName: "guardian_id",
-        },
-        coordinatorId: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "classes",
-            "coordinatorId"
-          >,
-          serverName: "coordinator_id",
         },
         trainerId: {
           type: "string",
@@ -509,13 +546,31 @@ export const schema = {
     },
   },
   relationships: {
-    classes: {
+    classCoordinators: {
+      class: [
+        {
+          sourceField: ["classId"],
+          destField: ["id"],
+          destSchema: "classes",
+          cardinality: "one",
+        },
+      ],
       coordinator: [
         {
           sourceField: ["coordinatorId"],
           destField: ["id"],
           destSchema: "users",
           cardinality: "one",
+        },
+      ],
+    },
+    classes: {
+      coordinators: [
+        {
+          sourceField: ["id"],
+          destField: ["classId"],
+          destSchema: "classCoordinators",
+          cardinality: "many",
         },
       ],
       trainer: [
@@ -662,14 +717,14 @@ export const schema = {
         {
           sourceField: ["id"],
           destField: ["coordinatorId"],
-          destSchema: "classes",
+          destSchema: "classCoordinators",
           cardinality: "many",
         },
       ],
       trainingClasses: [
         {
           sourceField: ["id"],
-          destField: ["coordinatorId"],
+          destField: ["trainerId"],
           destSchema: "classes",
           cardinality: "many",
         },
@@ -677,7 +732,7 @@ export const schema = {
       guardianingClasses: [
         {
           sourceField: ["id"],
-          destField: ["coordinatorId"],
+          destField: ["trainerId"],
           destSchema: "classes",
           cardinality: "many",
         },
@@ -693,6 +748,11 @@ export const schema = {
  * This type is auto-generated from your Drizzle schema definition.
  */
 export type Schema = typeof schema;
+/**
+ * Represents a row from the "classCoordinators" table.
+ * This type is auto-generated from your Drizzle schema definition.
+ */
+export type ClassCoordinator = Row<Schema["tables"]["classCoordinators"]>;
 /**
  * Represents a row from the "classes" table.
  * This type is auto-generated from your Drizzle schema definition.
