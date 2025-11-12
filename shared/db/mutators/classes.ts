@@ -18,12 +18,15 @@ type MutatorTx = Transaction<Schema>;
 
 export function createClassMutators(authData: AuthData | undefined) {
 	return {
-		create: async (tx: MutatorTx, data: CreateClassArgs) => {
+		create: async (
+			tx: MutatorTx,
+			{ coordinatorIds, ...data }: CreateClassArgs
+		) => {
 			assertIsAdmin(authData);
 			const classId = createId();
 			await tx.mutate.classes.insert({ id: classId, ...data });
 
-			for (const coordinatorId of data.coordinatorIds) {
+			for (const coordinatorId of coordinatorIds) {
 				await tx.mutate.classCoordinators.insert({
 					classId,
 					coordinatorId
