@@ -76,11 +76,13 @@ export async function assertIsAdminOrFacilitatorOrCoordinatorOfClass(
 	const isAdmin = authData?.meta.role === Roles.ADMIN;
 	const isFacilitator = authData?.meta.role === Roles.FACILITATOR;
 	const center = await tx.query.classes
-		.related('coordinator')
+		.related('coordinators')
 		.where('id', classId)
 		.one()
 		.run();
-	const isCoordinator = center?.coordinator?.id === authData?.sub;
+	const isCoordinator = center?.coordinators?.some(
+		coordinator => coordinator.coordinatorId === authData?.sub
+	);
 	if (!isAdmin && !isFacilitator && !isCoordinator) {
 		throw new Error('Unauthorized');
 	}
