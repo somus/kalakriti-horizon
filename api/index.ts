@@ -71,6 +71,12 @@ const clerkClient = createClerkClient({
 app.use('*', cors());
 app.use('*', clerkMiddleware());
 
+app.get('/', c => {
+	return c.json({
+		message: 'OK'
+	});
+});
+
 app.post('/push', async c => {
 	const auth = getAuth(c);
 	if (!auth?.userId) {
