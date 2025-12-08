@@ -258,7 +258,7 @@ app.delete('/deleteAsset', async c => {
 
 export default {
 	fetch: app.fetch,
-	port: 3000
+	port: env.PORT
 };
 
 //
