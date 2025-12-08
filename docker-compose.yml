@@ -37,7 +37,7 @@ services:
           '--no-verbose',
           '--tries=1',
           '--spider',
-          'http://localhost:4848/'
+          'http://localhost:4849/'
         ]
       interval: 10s
       timeout: 5s
@@ -49,20 +49,20 @@ services:
       - 'ZERO_CHANGE_DB=postgresql://${PG_USER}:${PG_PASSWORD}@postgres:5431/${PG_DB}'
       - 'ZERO_AUTH_JWKS_URL=${ZERO_AUTH_JWKS_URL}'
       - 'ZERO_ADMIN_PASSWORD=${ZERO_ADMIN_PASSWORD}'
-      - 'ZERO_MUTATE_URL=http://zero_push:3000/api/push'
-      - 'ZERO_GET_QUERIES_URL=http://zero_push:3000/api/get-queries'
+      - 'ZERO_MUTATE_URL=http://zero_push:3001/api/push'
+      - 'ZERO_GET_QUERIES_URL=http://zero_push:3001/api/get-queries'
       - ZERO_REPLICA_FILE=/zero_data/horizon_zstart_replica.db
-      - ZERO_PORT=4848
+      - ZERO_PORT=4849
     volumes:
       - 'replica:/zero_data'
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.zero-cache.rule=Host(`${DOMAIN}`) && PathPrefix(`/zero`)'
-      - 'traefik.http.routers.zero-cache.entrypoints=websecure'
-      - 'traefik.http.routers.zero-cache.tls.certresolver=letsencrypt'
-      - 'traefik.http.services.zero-cache.loadbalancer.server.port=4848'
-      - 'traefik.http.middlewares.zero-cache-strip.stripprefix.prefixes=/zero'
-      - 'traefik.http.routers.zero-cache.middlewares=zero-cache-strip'
+      - 'traefik.http.routers.horizon-zero-cache.rule=Host(`${DOMAIN}`) && PathPrefix(`/zero`)'
+      - 'traefik.http.routers.horizon-zero-cache.entrypoints=websecure'
+      - 'traefik.http.routers.horizon-zero-cache.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.horizon-zero-cache.loadbalancer.server.port=4849'
+      - 'traefik.http.middlewares.horizon-zero-cache-strip.stripprefix.prefixes=/zero'
+      - 'traefik.http.routers.horizon-zero-cache.middlewares=horizon-zero-cache-strip'
     networks:
       - dokploy-network
 
@@ -81,14 +81,14 @@ services:
           '--no-verbose',
           '--tries=1',
           '--spider',
-          'http://localhost:3000/api'
+          'http://localhost:3001/api'
         ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
     environment:
-      - PORT=3000
+      - PORT=3001
       - 'ZERO_UPSTREAM_DB=postgresql://${PG_USER}:${PG_PASSWORD}@postgres:5431/${PG_DB}'
       - 'CLERK_SECRET_KEY=${CLERK_SECRET_KEY}'
       - 'CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY}'
@@ -104,10 +104,10 @@ services:
     command: sh -c "bun install --ignore-scripts && bun run prod:api"
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.zero-push.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)'
-      - 'traefik.http.routers.zero-push.entrypoints=websecure'
-      - 'traefik.http.routers.zero-push.tls.certresolver=letsencrypt'
-      - 'traefik.http.services.zero-push.loadbalancer.server.port=3000'
+      - 'traefik.http.routers.horizon-zero-push.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)'
+      - 'traefik.http.routers.horizon-zero-push.entrypoints=websecure'
+      - 'traefik.http.routers.horizon-zero-push.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.horizon-zero-push.loadbalancer.server.port=3001'
     networks:
       - dokploy-network
 
@@ -150,11 +150,11 @@ services:
     command: sh -c "bun install --ignore-scripts && bun run build && bun install -g serve && serve -s dist -l 5174"
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.vite-app.rule=Host(`${DOMAIN}`)'
-      - 'traefik.http.routers.vite-app.entrypoints=websecure'
-      - 'traefik.http.routers.vite-app.tls.certresolver=letsencrypt'
-      - 'traefik.http.services.vite-app.loadbalancer.server.port=5174'
-      - 'traefik.http.routers.vite-app.priority=1'
+      - 'traefik.http.routers.horizon-vite-app.rule=Host(`${DOMAIN}`)'
+      - 'traefik.http.routers.horizon-vite-app.entrypoints=websecure'
+      - 'traefik.http.routers.horizon-vite-app.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.horizon-vite-app.loadbalancer.server.port=5174'
+      - 'traefik.http.routers.horizon-vite-app.priority=1'
     networks:
       - dokploy-network
 
