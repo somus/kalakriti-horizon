@@ -59,7 +59,7 @@ services:
       - 'traefik.enable=true'
       - 'traefik.http.routers.horizon-zero-cache.rule=Host(`${DOMAIN}`) && PathPrefix(`/zero`)'
       - 'traefik.http.routers.horizon-zero-cache.entrypoints=websecure'
-      - 'traefik.http.routers.horizon-zero-cache.tls.certresolver=letsencrypt'
+      # - 'traefik.http.routers.horizon-zero-cache.tls.certresolver=letsencrypt'
       - 'traefik.http.services.horizon-zero-cache.loadbalancer.server.port=4849'
       - 'traefik.http.middlewares.horizon-zero-cache-strip.stripprefix.prefixes=/zero'
       - 'traefik.http.routers.horizon-zero-cache.middlewares=horizon-zero-cache-strip'
@@ -106,7 +106,7 @@ services:
       - 'traefik.enable=true'
       - 'traefik.http.routers.horizon-zero-push.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)'
       - 'traefik.http.routers.horizon-zero-push.entrypoints=websecure'
-      - 'traefik.http.routers.horizon-zero-push.tls.certresolver=letsencrypt'
+      # - 'traefik.http.routers.horizon-zero-push.tls.certresolver=letsencrypt'
       - 'traefik.http.services.horizon-zero-push.loadbalancer.server.port=3001'
     networks:
       - dokploy-network
@@ -152,7 +152,7 @@ services:
       - 'traefik.enable=true'
       - 'traefik.http.routers.horizon-vite-app.rule=Host(`${DOMAIN}`)'
       - 'traefik.http.routers.horizon-vite-app.entrypoints=websecure'
-      - 'traefik.http.routers.horizon-vite-app.tls.certresolver=letsencrypt'
+      # - 'traefik.http.routers.horizon-vite-app.tls.certresolver=letsencrypt'
       - 'traefik.http.services.horizon-vite-app.loadbalancer.server.port=5174'
       - 'traefik.http.routers.horizon-vite-app.priority=1'
     networks:
