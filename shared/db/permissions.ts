@@ -33,6 +33,16 @@ export function assertIsAdminOrFinance(authData: AuthData | undefined) {
 	}
 }
 
+export function assertIsAdminOrFacilitator(authData: AuthData | undefined) {
+	assertIsLoggedIn(authData);
+	if (
+		authData?.meta.role !== Roles.ADMIN &&
+		authData?.meta.role !== Roles.FACILITATOR
+	) {
+		throw new Error('Unauthorized');
+	}
+}
+
 export async function assertIsAdminOrFacilitatorOrTrainerOfClass(
 	tx: Transaction<Schema>,
 	authData: AuthData | undefined,

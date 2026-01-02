@@ -4,6 +4,7 @@ import { Transaction } from '@rocicorp/zero';
 import {
 	AuthData,
 	assertIsAdmin,
+	assertIsAdminOrFacilitator,
 	assertIsAdminOrFinance
 } from '../permissions.ts';
 import { Schema } from '../zero-schema.gen.ts';
@@ -41,7 +42,7 @@ export function createInvoiceMutators(authData: AuthData | undefined) {
 			}
 		},
 		toggleApproved: async (tx: MutatorTx, id: string) => {
-			assertIsAdminOrFinance(authData);
+			assertIsAdminOrFacilitator(authData);
 
 			const invoice = await tx.query.invoices.where('id', id).one().run();
 			if (!invoice) {
