@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
 let logoCache: Uint8Array | null = null;
 async function getLogo(): Promise<Uint8Array> {
 	if (logoCache) return logoCache;
-	const file = Bun.file(`${process.cwd()}/public/proud-indian-logo.png`);
+	const file = Bun.file(`${process.cwd()}/dist/proud-indian-logo.png`);
 	const arr = new Uint8Array(await file.arrayBuffer());
 	logoCache = arr;
 	return arr;
@@ -334,7 +334,7 @@ export async function generateMissingInvoices() {
 			const classId = row.class_id;
 
 			const classInfoRows: unknown = await db`
-                SELECT 
+                SELECT
                     c.id,
                     c.name,
                     c.trainer_cost_per_session as "trainerCostPerSession",
@@ -395,7 +395,7 @@ export async function generateMissingInvoicesForClass(classId: string) {
 	const db = new SQL(env.ZERO_UPSTREAM_DB);
 	try {
 		const classInfoRows: unknown = await db`
-            SELECT 
+            SELECT
                 c.id,
                 c.name,
                 c.trainer_cost_per_session as "trainerCostPerSession",
