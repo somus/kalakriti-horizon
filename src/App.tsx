@@ -19,6 +19,9 @@ const ParticipantsView = lazy(
 );
 const SessionsView = lazy(() => import('@/views/SessionsView/SessionsView'));
 const InvoicesView = lazy(() => import('@/views/InvoicesView/InvoicesView'));
+const AllInvoicesView = lazy(
+	() => import('@/views/AllInvoicesView/AllInvoicesView')
+);
 
 function App() {
 	return (
@@ -38,6 +41,19 @@ function App() {
 								<Suspense fallback={<LoadingScreen />}>
 									<DefaultView />
 								</Suspense>
+							}
+						/>
+
+						<Route
+							path='/invoices'
+							element={
+								<ProtectedRoute
+									allowedRoles={[Roles.ADMIN, Roles.FACILITATOR, Roles.FINANCE]}
+								>
+									<Suspense fallback={<LoadingScreen />}>
+										<AllInvoicesView />
+									</Suspense>
+								</ProtectedRoute>
 							}
 						/>
 

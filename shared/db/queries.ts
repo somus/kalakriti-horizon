@@ -117,5 +117,15 @@ export const queries = {
 
 			return query.one();
 		}
+	),
+	allInvoicesWithRelations: syncedQueryWithContext(
+		'allInvoicesWithRelations',
+		z.tuple([]),
+		() => {
+			return builder.invoices
+				.related('class', q => q.related('trainer'))
+				.related('sessions')
+				.orderBy('createdAt', 'desc');
+		}
 	)
 } as const;

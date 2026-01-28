@@ -25,6 +25,11 @@ const getAdminNavItems = (classes: Class[]): NavItem[] => [
 		icon: UsersIcon
 	},
 	{
+		title: 'Invoices',
+		url: '/invoices',
+		icon: BadgeIndianRupeeIcon
+	},
+	{
 		title: 'Classes',
 		url: '/classes',
 		icon: SchoolIcon,
