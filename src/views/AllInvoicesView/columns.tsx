@@ -53,7 +53,7 @@ export const columns = [
 	columnHelper.accessor(
 		row =>
 			row.class?.trainer
-				? `${row.class.trainer.firstName} ${row.class.trainer.lastName}`
+				? `${row.class.trainer.firstName} ${row.class.trainer.lastName ?? ''}`
 				: '',
 		{
 			id: 'trainer',
